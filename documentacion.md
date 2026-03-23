@@ -277,7 +277,7 @@ com.intercambios.intercambios_api
 │   ├── AlimentoController         → GET /api/alimentos, /por-subgrupo/{id}, /{id}/intercambios
 │   └── NutrienteAlimentoController→ GET /api/nutrientes/alimento/{id}
 └── Application.java               → @SpringBootApplication + CORS config
-
+:)))
 
 ================================================================
 FIN DE LA DOCUMENTACIÓN
