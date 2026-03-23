@@ -2,6 +2,7 @@ package com.intercambios.intercambios_api.model;
 import jakarta.persistence.*;
 @Entity
 @Table(name = "alimento")
+//actualizar tabla
 public class Alimento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
