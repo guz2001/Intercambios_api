@@ -21,7 +21,7 @@ public class AlimentoController {
     public List<Alimento> listarPorSubgrupo(@PathVariable Integer subgrupoId) {
         return service.listarPorSubgrupo(subgrupoId);
     }
-
+    //
     @GetMapping("/{id}/intercambios")
     public List<Alimento> buscarIntercambios(@PathVariable Integer id) {
         return service.buscarIntercambios(id);
