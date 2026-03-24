@@ -15,7 +15,7 @@ public class RequerimientosEnergeticos {
         this.sexo=sexo;
         this.factorActividad=factorActividad;
     }
-
+    //creacion de getter para conseguir los datos
     public double getPeso() {
         return peso;
     }
@@ -35,7 +35,7 @@ public class RequerimientosEnergeticos {
     public double getFactorActividad() {
         return factorActividad;
     }
-
+    //setter para colocar los datos
     public void setPeso(double peso) {
         this.peso = peso;
     }
