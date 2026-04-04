@@ -1,4 +1,4 @@
-package com.intercambios.intercambios_api.model;
+package com.intercambios.intercambios_api.controller;
 import com.intercambios.intercambios_api.model.Alimento;
 import com.intercambios.intercambios_api.service.AlimentoService;
 import org.springframework.web.bind.annotation.*;
