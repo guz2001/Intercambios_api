@@ -9,7 +9,7 @@ public class Paciente {
     private Integer id;
     //validamos la columna y establecemos que no puede estar vacia
     @Column(nullable = false, length=200)
-    private String nombre;
+    private String nombre;// creamos la variables donde se almacenaran los datos de la columna
 
     @Column(nullable = false)
     private  Integer edad;
@@ -27,6 +27,7 @@ public class Paciente {
     private  Sexo sexo;// como sexo puede variar llamamos la clase sexo donde estaran
     //almacenados las formulas de harrys-benedict para hombre y mujer, y para menores de 2 años
     // otras formulas
+
 
 
 
