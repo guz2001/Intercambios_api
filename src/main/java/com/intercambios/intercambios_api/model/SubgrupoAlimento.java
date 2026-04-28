@@ -1,9 +1,10 @@
 package com.intercambios.intercambios_api.model;
 
+import com.intercambios.intercambios_api.converter.PoblacionConverter;
 import jakarta.persistence.*;
 
 /**
- * Entidad que representa una subdivisión dentro dahe un {@link GrupoAlimento}.
+ * Entidad que representa una subdivisión dentro de un {@link GrupoAlimento}.
  *
  * <p>Un subgrupo reúne alimentos intercambiables entre sí, es decir, que
  * aportan una cantidad calórica equivalente por porción. El campo
@@ -11,7 +12,10 @@ import jakarta.persistence.*;
  * sistema de intercambios.</p>
  *
  * <p>El campo {@code poblacion} indica el grupo etario al que aplica
- * el subgrupo, ya que los valores de intercambio difieren según la edad.</p>
+ * el subgrupo, ya que los valores de intercambio difieren según la edad.
+ * Utiliza el enum {@link Poblacion} con un {@link PoblacionConverter} que
+ * mapea automáticamente entre las constantes Java y los valores de la
+ * columna ENUM de MySQL.</p>
  *
  * <p>Mapea la tabla {@code subgrupo_alimento}.</p>
  */
@@ -33,19 +37,14 @@ public class SubgrupoAlimento {
     private String nombre;
 
     /**
-     * Población objetivo del subgrupo.
+     * Grupo de población al que aplica este subgrupo alimentario.
      *
-     * <p>Valores válidos según la base de datos:
-     * {@code ninos_adultos}, {@code menores_2_anos}, {@code adultos},
-     * {@code ninos}, {@code general}.</p>
-     *
-     * <p><b>MEJORA:</b> Este campo debería ser un {@code enum} de Java
-     * (similar a {@link Sexo}) en lugar de un {@code String} libre.
-     * Usar un enum previene valores inválidos en tiempo de compilación
-     * y elimina la necesidad de definir el ENUM directamente en SQL.</p>
+     * <p>El {@link PoblacionConverter} (registrado con {@code autoApply = true})
+     * traduce automáticamente entre el enum Java y los valores lowercase
+     * de la columna ENUM en MySQL, sin necesidad de modificar el esquema.</p>
      */
     @Column(name = "poblacion", columnDefinition = "ENUM('ninos_adultos','menores_2_anos','adultos','ninos','general')")
-    private String poblacion;
+    private Poblacion poblacion;
 
     /**
      * Kilocalorías promedio por porción estándar para este subgrupo.
@@ -65,8 +64,8 @@ public class SubgrupoAlimento {
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public String getPoblacion() { return poblacion; }
-    public void setPoblacion(String poblacion) { this.poblacion = poblacion; }
+    public Poblacion getPoblacion() { return poblacion; }
+    public void setPoblacion(Poblacion poblacion) { this.poblacion = poblacion; }
 
     public Double getKcalPromedio() { return kcalPromedio; }
     public void setKcalPromedio(Double kcalPromedio) { this.kcalPromedio = kcalPromedio; }

@@ -13,18 +13,15 @@ import java.util.List;
 public interface SeleccionIntercambioRepository extends JpaRepository<SeleccionIntercambio, Integer> {
 
     /**
-     * Devuelve todas las selecciones de intercambio registradas para un paciente.
+     * Devuelve las selecciones de un paciente ordenadas de más reciente a más antigua.
      *
-     * <p>Permite construir el historial de sustituciones alimentarias de
-     * una consulta o plan nutricional.</p>
+     * <p>El sufijo {@code OrderByFechaSeleccionDesc} en el nombre del método instruye
+     * a Spring Data JPA para agregar automáticamente {@code ORDER BY fecha_seleccion DESC}
+     * a la consulta SQL generada, sin necesidad de escribir una query explícita.</p>
      *
      * @param pacienteId ID del paciente
-     * @return lista de selecciones del paciente ordenadas por defecto por ID;
+     * @return lista de selecciones del paciente, las más recientes primero;
      *         vacía si el paciente no tiene selecciones registradas
-     *
-     * <p><b>MEJORA:</b> Agregar {@code OrderBy} para ordenar por fecha descendente
-     * y mostrar siempre las selecciones más recientes primero:
-     * {@code findByPacienteIdOrderByFechaSeleccionDesc}.</p>
      */
-    List<SeleccionIntercambio> findByPacienteId(Integer pacienteId);
+    List<SeleccionIntercambio> findByPacienteIdOrderByFechaSeleccionDesc(Integer pacienteId);
 }

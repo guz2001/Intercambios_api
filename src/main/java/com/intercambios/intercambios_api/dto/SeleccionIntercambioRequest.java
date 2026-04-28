@@ -1,35 +1,32 @@
 package com.intercambios.intercambios_api.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 /**
  * DTO de entrada para registrar una selección de intercambio alimentario.
  *
  * <p>Desacopla el cuerpo de la petición HTTP de la entidad JPA
- * {@code SeleccionIntercambio}, siguiendo el principio de separación
- * de responsabilidades: el controlador recibe este DTO y el servicio
- * lo convierte en la entidad persistida.</p>
+ * {@code SeleccionIntercambio}. Los campos obligatorios están anotados
+ * con {@code @NotNull} para que Spring rechace automáticamente peticiones
+ * incompletas con {@code 400 Bad Request} antes de llegar al servicio,
+ * siempre que el controlador use {@code @Valid} en el parámetro.</p>
  *
- * <p><b>MEJORA:</b> Agregar la dependencia {@code spring-boot-starter-validation}
- * al {@code pom.xml} y anotar los campos con {@code @NotNull} para que Spring
- * rechace automáticamente peticiones incompletas con {@code 400 Bad Request},
- * sin necesidad de validación manual en el servicio:
- * <pre>
- *   {@literal @}NotNull(message = "El alimento origen es obligatorio")
- *   private Integer alimentoOrigenId;
- * </pre>
- * Y en el controlador añadir {@code @Valid} antes del {@code @RequestBody}.</p>
+ * <p>El manejo del error de validación está centralizado en
+ * {@code GlobalExceptionHandler#handleValidation}.</p>
  */
 public class SeleccionIntercambioRequest {
 
     /**
-     * ID del alimento que el paciente desea reemplazar.
-     * Obligatorio: el servicio lanza {@code IllegalArgumentException} si es nulo o inexistente.
+     * ID del alimento que el paciente desea reemplazar. Obligatorio.
      */
+    @NotNull(message = "El ID del alimento origen es obligatorio")
     private Integer alimentoOrigenId;
 
     /**
-     * ID del alimento elegido como sustituto.
+     * ID del alimento elegido como sustituto. Obligatorio.
      * Debe pertenecer al mismo subgrupo que {@code alimentoOrigenId}.
      */
+    @NotNull(message = "El ID del alimento reemplazo es obligatorio")
     private Integer alimentoReemplazoId;
 
     /**

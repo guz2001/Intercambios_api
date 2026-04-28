@@ -8,6 +8,7 @@ import com.intercambios.intercambios_api.repository.AlimentoRepository;
 import com.intercambios.intercambios_api.repository.PacienteRepository;
 import com.intercambios.intercambios_api.repository.SeleccionIntercambioRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,9 +17,8 @@ import java.util.List;
  * de intercambio alimentario de los pacientes.
  *
  * <p>Una selección de intercambio es la decisión de un paciente de reemplazar
- * un alimento ({@code alimentoOrigen}) por otro equivalente ({@code alimentoReemplazo})
- * dentro del mismo subgrupo alimentario. Este servicio valida esa equivalencia
- * antes de persistir el registro.</p>
+ * {@code alimentoOrigen} por {@code alimentoReemplazo}. Este servicio valida que
+ * ambos alimentos pertenezcan al mismo subgrupo antes de persistir el registro.</p>
  *
  * <p>La inyección de dependencias se realiza por constructor para facilitar
  * las pruebas unitarias con mocks sin necesidad del contexto de Spring.</p>
@@ -41,14 +41,17 @@ public class SeleccionIntercambioService {
     /**
      * Valida y persiste una nueva selección de intercambio.
      *
+     * <p>{@code @Transactional} garantiza que las lecturas de validación y la
+     * escritura final ocurran en una sola transacción. Si cualquier paso falla,
+     * toda la operación se revierte (rollback automático).</p>
+     *
      * <p>El flujo de validación es:
      * <ol>
      *   <li>Verificar que el alimento origen exista.</li>
      *   <li>Verificar que el alimento reemplazo exista.</li>
-     *   <li>Verificar que ambos alimentos pertenezcan al mismo subgrupo
-     *       (condición de intercambiabilidad).</li>
+     *   <li>Verificar que ambos pertenezcan al mismo subgrupo (intercambiables).</li>
      *   <li>Si se proporcionó {@code pacienteId}, verificar que el paciente exista.</li>
-     *   <li>Asignar la marca de tiempo actual y persistir.</li>
+     *   <li>Asignar la marca de tiempo y persistir.</li>
      * </ol>
      * </p>
      *
@@ -56,11 +59,8 @@ public class SeleccionIntercambioService {
      * @return la entidad {@link SeleccionIntercambio} persistida con su ID asignado
      * @throws IllegalArgumentException si algún ID no existe o los alimentos
      *                                  no son intercambiables
-     *
-     * <p><b>MEJORA:</b> Anotar el método con {@code @Transactional} para garantizar
-     * que todas las lecturas de validación y la escritura ocurran en una sola
-     * transacción de base de datos, evitando lecturas sucias.</p>
      */
+    @Transactional
     public SeleccionIntercambio guardar(SeleccionIntercambioRequest request) {
         Alimento origen = alimentoRepository.findById(request.getAlimentoOrigenId())
                 .orElseThrow(() -> new IllegalArgumentException("Alimento origen no encontrado"));
@@ -93,29 +93,28 @@ public class SeleccionIntercambioService {
      *
      * @return lista de todas las selecciones registradas
      */
+    @Transactional(readOnly = true)
     public List<SeleccionIntercambio> listarTodas() {
         return seleccionRepository.findAll();
     }
 
     /**
-     * Devuelve todas las selecciones de intercambio registradas para un paciente.
+     * Devuelve las selecciones de un paciente ordenadas de más reciente a más antigua.
      *
      * @param pacienteId ID del paciente
-     * @return lista de selecciones del paciente; vacía si no tiene registros
+     * @return lista de selecciones del paciente en orden cronológico descendente
      */
+    @Transactional(readOnly = true)
     public List<SeleccionIntercambio> listarPorPaciente(Integer pacienteId) {
-        return seleccionRepository.findByPacienteId(pacienteId);
+        return seleccionRepository.findByPacienteIdOrderByFechaSeleccionDesc(pacienteId);
     }
 
     /**
      * Elimina una selección de intercambio por su ID.
      *
-     * <p><b>MEJORA:</b> Verificar que el ID exista antes de eliminar y lanzar
-     * una excepción descriptiva si no se encuentra, en lugar de que JPA
-     * falle silenciosamente.</p>
-     *
      * @param id ID de la selección a eliminar
      */
+    @Transactional
     public void eliminar(Integer id) {
         seleccionRepository.deleteById(id);
     }

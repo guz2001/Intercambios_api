@@ -3,6 +3,7 @@ package com.intercambios.intercambios_api.controller;
 import com.intercambios.intercambios_api.dto.SeleccionIntercambioRequest;
 import com.intercambios.intercambios_api.model.SeleccionIntercambio;
 import com.intercambios.intercambios_api.service.SeleccionIntercambioService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -15,10 +16,10 @@ import java.util.List;
  * de negocio (existencia de alimentos, equivalencia de subgrupo) se delegan
  * completamente a {@link SeleccionIntercambioService}.</p>
  *
- * <p><b>MEJORA:</b> Centralizar el manejo de errores en una clase anotada con
- * {@code @ControllerAdvice} para evitar el bloque {@code try/catch} en cada
- * controlador y retornar respuestas de error con formato JSON consistente
- * en toda la API.</p>
+ * <p>El manejo de errores ({@code IllegalArgumentException} y errores de
+ * validación {@code @Valid}) está centralizado en
+ * {@code GlobalExceptionHandler}, eliminando la necesidad de bloques
+ * {@code try/catch} en este controlador.</p>
  */
 @RestController
 @RequestMapping("/api/selecciones")
@@ -35,18 +36,16 @@ public class SeleccionIntercambioController {
      *
      * <p>{@code POST /api/selecciones}</p>
      *
+     * <p>{@code @Valid} activa la validación de las anotaciones {@code @NotNull}
+     * del DTO antes de que el cuerpo llegue al servicio. Si la validación falla,
+     * {@code GlobalExceptionHandler} responde con {@code 400 Bad Request}.</p>
+     *
      * @param request DTO con los IDs del alimento origen, reemplazo y paciente (opcional)
-     * @return {@code 200 OK} con la selección persistida,
-     *         {@code 400 Bad Request} con mensaje de error si la validación falla
+     * @return {@code 200 OK} con la selección persistida
      */
     @PostMapping
-    public ResponseEntity<?> guardar(@RequestBody SeleccionIntercambioRequest request) {
-        try {
-            SeleccionIntercambio guardada = service.guardar(request);
-            return ResponseEntity.ok(guardada);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<SeleccionIntercambio> guardar(@Valid @RequestBody SeleccionIntercambioRequest request) {
+        return ResponseEntity.ok(service.guardar(request));
     }
 
     /**
@@ -62,7 +61,8 @@ public class SeleccionIntercambioController {
     }
 
     /**
-     * Devuelve el historial de intercambios seleccionados por un paciente específico.
+     * Devuelve el historial de intercambios de un paciente específico,
+     * ordenado de más reciente a más antiguo.
      *
      * <p>{@code GET /api/selecciones/paciente/{pacienteId}}</p>
      *

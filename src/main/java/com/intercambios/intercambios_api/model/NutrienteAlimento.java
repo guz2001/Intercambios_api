@@ -1,6 +1,7 @@
 package com.intercambios.intercambios_api.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * Entidad que almacena la composición nutricional detallada de un {@link Alimento}.
@@ -8,6 +9,11 @@ import jakarta.persistence.*;
  * <p>Cada alimento tiene exactamente un perfil de nutrientes (relación {@code OneToOne}).
  * Los valores representan la cantidad de cada nutriente presente en la porción
  * estándar definida en {@link Alimento#getPorcionGramos()}.</p>
+ *
+ * <p>Los campos numéricos usan {@link BigDecimal} en lugar de {@code Double} para
+ * evitar errores de punto flotante en cálculos nutricionales acumulados (ej. al
+ * sumar los nutrientes de un plan alimentario completo). {@code BigDecimal} mapea
+ * directamente a las columnas {@code DECIMAL} de MySQL sin pérdida de precisión.</p>
  *
  * <p>Las unidades de medida son:
  * <ul>
@@ -19,10 +25,6 @@ import jakarta.persistence.*;
  * </p>
  *
  * <p>Mapea la tabla {@code nutriente_alimento}.</p>
- *
- * <p><b>MEJORA:</b> Los campos numéricos usan {@code Double}, que puede
- * introducir errores de redondeo en sumas acumuladas. Para mayor precisión
- * en reportes dietéticos, considerar {@code BigDecimal}.</p>
  */
 @Entity
 @Table(name = "nutriente_alimento")
@@ -42,54 +44,54 @@ public class NutrienteAlimento {
 
     /** Energía total de la porción en kilocalorías. */
     @Column(columnDefinition = "DECIMAL(8,2)")
-    private Double kcal;
+    private BigDecimal kcal;
 
     /** Contenido de proteína en gramos. */
     @Column(name = "proteina_g", columnDefinition = "DECIMAL(8,2)")
-    private Double proteinaG;
+    private BigDecimal proteinaG;
 
     /** Grasa total en gramos (incluye saturadas, mono y poliinsaturadas). */
     @Column(name = "grasa_total_g", columnDefinition = "DECIMAL(8,2)")
-    private Double grasaTotalG;
+    private BigDecimal grasaTotalG;
 
     /**
      * Ácidos grasos saturados (AGS) en gramos.
      * Precisión de 3 decimales por los valores muy pequeños en algunos alimentos.
      */
     @Column(name = "ags_g", columnDefinition = "DECIMAL(8,3)")
-    private Double agsG;
+    private BigDecimal agsG;
 
     /** Carbohidratos disponibles (CHO) en gramos. */
     @Column(name = "cho_g", columnDefinition = "DECIMAL(8,2)")
-    private Double choG;
+    private BigDecimal choG;
 
     /** Fibra dietética total en gramos. */
     @Column(name = "fibra_g", columnDefinition = "DECIMAL(8,2)")
-    private Double fibraG;
+    private BigDecimal fibraG;
 
     /** Calcio en miligramos. */
     @Column(name = "calcio_mg", columnDefinition = "DECIMAL(8,2)")
-    private Double calcioMg;
+    private BigDecimal calcioMg;
 
     /** Hierro en miligramos. Precisión de 3 decimales por valores inferiores a 1 mg. */
     @Column(name = "hierro_mg", columnDefinition = "DECIMAL(8,3)")
-    private Double hierroMg;
+    private BigDecimal hierroMg;
 
     /** Sodio en miligramos. */
     @Column(name = "sodio_mg", columnDefinition = "DECIMAL(8,2)")
-    private Double sodioMg;
+    private BigDecimal sodioMg;
 
     /** Potasio en miligramos. */
     @Column(name = "potasio_mg", columnDefinition = "DECIMAL(8,2)")
-    private Double potasioMg;
+    private BigDecimal potasioMg;
 
     /** Vitamina C en miligramos. */
     @Column(name = "vitamina_c_mg", columnDefinition = "DECIMAL(8,2)")
-    private Double vitaminaCMg;
+    private BigDecimal vitaminaCMg;
 
     /** Vitamina B12 en microgramos (mcg). Precisión de 3 decimales por valores traza. */
     @Column(name = "vitamina_b12_mcg", columnDefinition = "DECIMAL(8,3)")
-    private Double vitaminaB12Mcg;
+    private BigDecimal vitaminaB12Mcg;
 
     public NutrienteAlimento() {}
 
@@ -99,39 +101,39 @@ public class NutrienteAlimento {
     public Alimento getAlimento() { return alimento; }
     public void setAlimento(Alimento alimento) { this.alimento = alimento; }
 
-    public Double getKcal() { return kcal; }
-    public void setKcal(Double kcal) { this.kcal = kcal; }
+    public BigDecimal getKcal() { return kcal; }
+    public void setKcal(BigDecimal kcal) { this.kcal = kcal; }
 
-    public Double getProteinaG() { return proteinaG; }
-    public void setProteinaG(Double proteinaG) { this.proteinaG = proteinaG; }
+    public BigDecimal getProteinaG() { return proteinaG; }
+    public void setProteinaG(BigDecimal proteinaG) { this.proteinaG = proteinaG; }
 
-    public Double getGrasaTotalG() { return grasaTotalG; }
-    public void setGrasaTotalG(Double grasaTotalG) { this.grasaTotalG = grasaTotalG; }
+    public BigDecimal getGrasaTotalG() { return grasaTotalG; }
+    public void setGrasaTotalG(BigDecimal grasaTotalG) { this.grasaTotalG = grasaTotalG; }
 
-    public Double getAgsG() { return agsG; }
-    public void setAgsG(Double agsG) { this.agsG = agsG; }
+    public BigDecimal getAgsG() { return agsG; }
+    public void setAgsG(BigDecimal agsG) { this.agsG = agsG; }
 
-    public Double getChoG() { return choG; }
-    public void setChoG(Double choG) { this.choG = choG; }
+    public BigDecimal getChoG() { return choG; }
+    public void setChoG(BigDecimal choG) { this.choG = choG; }
 
-    public Double getFibraG() { return fibraG; }
-    public void setFibraG(Double fibraG) { this.fibraG = fibraG; }
+    public BigDecimal getFibraG() { return fibraG; }
+    public void setFibraG(BigDecimal fibraG) { this.fibraG = fibraG; }
 
-    public Double getCalcioMg() { return calcioMg; }
-    public void setCalcioMg(Double calcioMg) { this.calcioMg = calcioMg; }
+    public BigDecimal getCalcioMg() { return calcioMg; }
+    public void setCalcioMg(BigDecimal calcioMg) { this.calcioMg = calcioMg; }
 
-    public Double getHierroMg() { return hierroMg; }
-    public void setHierroMg(Double hierroMg) { this.hierroMg = hierroMg; }
+    public BigDecimal getHierroMg() { return hierroMg; }
+    public void setHierroMg(BigDecimal hierroMg) { this.hierroMg = hierroMg; }
 
-    public Double getSodioMg() { return sodioMg; }
-    public void setSodioMg(Double sodioMg) { this.sodioMg = sodioMg; }
+    public BigDecimal getSodioMg() { return sodioMg; }
+    public void setSodioMg(BigDecimal sodioMg) { this.sodioMg = sodioMg; }
 
-    public Double getPotasioMg() { return potasioMg; }
-    public void setPotasioMg(Double potasioMg) { this.potasioMg = potasioMg; }
+    public BigDecimal getPotasioMg() { return potasioMg; }
+    public void setPotasioMg(BigDecimal potasioMg) { this.potasioMg = potasioMg; }
 
-    public Double getVitaminaCMg() { return vitaminaCMg; }
-    public void setVitaminaCMg(Double vitaminaCMg) { this.vitaminaCMg = vitaminaCMg; }
+    public BigDecimal getVitaminaCMg() { return vitaminaCMg; }
+    public void setVitaminaCMg(BigDecimal vitaminaCMg) { this.vitaminaCMg = vitaminaCMg; }
 
-    public Double getVitaminaB12Mcg() { return vitaminaB12Mcg; }
-    public void setVitaminaB12Mcg(Double vitaminaB12Mcg) { this.vitaminaB12Mcg = vitaminaB12Mcg; }
+    public BigDecimal getVitaminaB12Mcg() { return vitaminaB12Mcg; }
+    public void setVitaminaB12Mcg(BigDecimal vitaminaB12Mcg) { this.vitaminaB12Mcg = vitaminaB12Mcg; }
 }
