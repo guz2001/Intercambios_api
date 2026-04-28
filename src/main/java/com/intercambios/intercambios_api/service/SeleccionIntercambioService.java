@@ -13,15 +13,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Servicio de lógica de negocio para registrar y consultar las selecciones
+ * Servicio de logica de negocio para registrar y consultar las selecciones
  * de intercambio alimentario de los pacientes.
  *
- * <p>Una selección de intercambio es la decisión de un paciente de reemplazar
- * {@code alimentoOrigen} por {@code alimentoReemplazo}. Este servicio valida que
- * ambos alimentos pertenezcan al mismo subgrupo antes de persistir el registro.</p>
- *
- * <p>La inyección de dependencias se realiza por constructor para facilitar
- * las pruebas unitarias con mocks sin necesidad del contexto de Spring.</p>
+ * <p>Una seleccion de intercambio es la decision de un paciente de reemplazar
+ * alimentoOrigen por alimentoReemplazo. Este servicio valida que ambos alimentos
+ * pertenezcan al mismo subgrupo antes de persistir el registro.</p>
  */
 @Service
 public class SeleccionIntercambioService {
@@ -39,26 +36,14 @@ public class SeleccionIntercambioService {
     }
 
     /**
-     * Valida y persiste una nueva selección de intercambio.
+     * Valida y persiste una nueva seleccion de intercambio.
      *
-     * <p>{@code @Transactional} garantiza que las lecturas de validación y la
-     * escritura final ocurran en una sola transacción. Si cualquier paso falla,
-     * toda la operación se revierte (rollback automático).</p>
-     *
-     * <p>El flujo de validación es:
-     * <ol>
-     *   <li>Verificar que el alimento origen exista.</li>
-     *   <li>Verificar que el alimento reemplazo exista.</li>
-     *   <li>Verificar que ambos pertenezcan al mismo subgrupo (intercambiables).</li>
-     *   <li>Si se proporcionó {@code pacienteId}, verificar que el paciente exista.</li>
-     *   <li>Asignar la marca de tiempo y persistir.</li>
-     * </ol>
-     * </p>
+     * <p>Flujo: verifica que origen y reemplazo existan, que sean del mismo subgrupo,
+     * y opcionalmente que el paciente exista si se proporciona pacienteId.</p>
      *
      * @param request DTO con los IDs del alimento origen, reemplazo y paciente (opcional)
-     * @return la entidad {@link SeleccionIntercambio} persistida con su ID asignado
-     * @throws IllegalArgumentException si algún ID no existe o los alimentos
-     *                                  no son intercambiables
+     * @return la entidad SeleccionIntercambio persistida con su ID asignado
+     * @throws IllegalArgumentException si algun ID no existe o los alimentos no son intercambiables
      */
     @Transactional
     public SeleccionIntercambio guardar(SeleccionIntercambioRequest request) {
@@ -68,7 +53,6 @@ public class SeleccionIntercambioService {
         Alimento reemplazo = alimentoRepository.findById(request.getAlimentoReemplazoId())
                 .orElseThrow(() -> new IllegalArgumentException("Alimento reemplazo no encontrado"));
 
-        // Los alimentos sólo son intercambiables si pertenecen al mismo subgrupo
         if (!origen.getSubgrupo().getId().equals(reemplazo.getSubgrupo().getId())) {
             throw new IllegalArgumentException(
                     "Los alimentos no son intercambiables: pertenecen a subgrupos distintos");
@@ -88,32 +72,19 @@ public class SeleccionIntercambioService {
         return seleccionRepository.save(seleccion);
     }
 
-    /**
-     * Devuelve el historial completo de selecciones de intercambio.
-     *
-     * @return lista de todas las selecciones registradas
-     */
+    /** Devuelve el historial completo de selecciones de intercambio. */
     @Transactional(readOnly = true)
     public List<SeleccionIntercambio> listarTodas() {
         return seleccionRepository.findAll();
     }
 
-    /**
-     * Devuelve las selecciones de un paciente ordenadas de más reciente a más antigua.
-     *
-     * @param pacienteId ID del paciente
-     * @return lista de selecciones del paciente en orden cronológico descendente
-     */
+    /** Devuelve las selecciones de un paciente ordenadas de mas reciente a mas antigua. */
     @Transactional(readOnly = true)
     public List<SeleccionIntercambio> listarPorPaciente(Integer pacienteId) {
         return seleccionRepository.findByPacienteIdOrderByFechaSeleccionDesc(pacienteId);
     }
 
-    /**
-     * Elimina una selección de intercambio por su ID.
-     *
-     * @param id ID de la selección a eliminar
-     */
+    /** Elimina una seleccion de intercambio por su ID. */
     @Transactional
     public void eliminar(Integer id) {
         seleccionRepository.deleteById(id);

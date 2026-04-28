@@ -37,6 +37,16 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Maneja recursos no encontrados (ID inexistente en base de datos).
+     *
+     * @return {@code 404 Not Found} con el mensaje descriptivo
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    /**
      * Maneja errores de validación de campos del cuerpo JSON (anotaciones {@code @NotNull},
      * {@code @NotBlank}, etc.).
      *
