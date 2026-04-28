@@ -63,6 +63,19 @@
 
 	<build>
 		<plugins>
+			<!--
+				maven-compiler-plugin: fuerza la compilación con Java 21 (Temurin).
+				'release' garantiza que el bytecode sea compatible con Java 21
+				independientemente del JDK que resuelva JAVA_HOME en el entorno.
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>21</source>
+					<release>21</release>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
