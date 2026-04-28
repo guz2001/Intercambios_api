@@ -1,7 +1,9 @@
 package com.intercambios.intercambios_api.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -51,5 +53,31 @@ public class GlobalExceptionHandler {
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
         return ResponseEntity.badRequest().body(errores);
+    }
+
+    /**
+     * Maneja el intento de usar un método HTTP no soportado en un endpoint.
+     *
+     * <p>Ocurre cuando, por ejemplo, se hace una petición {@code GET} a un endpoint
+     * que solo acepta {@code POST} (como {@code /api/requerimientos/calcular} o
+     * {@code /api/selecciones}). Esto es común al abrir una URL POST directamente
+     * en el navegador o al configurar incorrectamente el método en el cliente.</p>
+     *
+     * <p>Sin este manejador, Spring registra el error como {@code WARN} en los logs
+     * y devuelve una página HTML genérica. Con él, el cliente recibe un mensaje
+     * claro en JSON indicando qué método sí es aceptado.</p>
+     *
+     * @param ex excepción con el método recibido y los métodos soportados
+     * @return {@code 405 Method Not Allowed} con un mensaje descriptivo
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<String> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        String metodosSoportados = ex.getSupportedHttpMethods() != null
+                ? ex.getSupportedHttpMethods().toString()
+                : "desconocidos";
+        String mensaje = String.format(
+                "El método '%s' no está permitido para esta URL. Métodos aceptados: %s",
+                ex.getMethod(), metodosSoportados);
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(mensaje);
     }
 }
