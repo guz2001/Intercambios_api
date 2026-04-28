@@ -1,0 +1,344 @@
+{
+  "info": {
+    "name": "Intercambios API",
+    "description": "Colección completa de endpoints para el sistema de listas de intercambios alimentarios.\n\nImporta también el archivo `intercambios_api.postman_environment.json` para configurar la variable `baseUrl` automáticamente.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Grupos",
+      "description": "Primer nivel de la jerarquía alimentaria.",
+      "item": [
+        {
+          "name": "Listar todos los grupos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/grupos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "grupos"]
+            },
+            "description": "Devuelve el catálogo completo de grupos alimentarios."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subgrupos",
+      "description": "Segundo nivel de la jerarquía alimentaria.",
+      "item": [
+        {
+          "name": "Listar todos los subgrupos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subgrupos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subgrupos"]
+            },
+            "description": "Devuelve todos los subgrupos con su grupo padre anidado."
+          }
+        },
+        {
+          "name": "Listar subgrupos por grupo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subgrupos/por-grupo/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subgrupos", "por-grupo", "1"]
+            },
+            "description": "Devuelve los subgrupos que pertenecen al grupo con ID indicado."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Alimentos",
+      "description": "Catálogo de alimentos y búsqueda de intercambios.",
+      "item": [
+        {
+          "name": "Listar todos los alimentos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/alimentos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "alimentos"]
+            },
+            "description": "Devuelve el catálogo completo de alimentos con su subgrupo anidado."
+          }
+        },
+        {
+          "name": "Listar alimentos por subgrupo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/alimentos/por-subgrupo/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "alimentos", "por-subgrupo", "1"]
+            },
+            "description": "Devuelve los alimentos que pertenecen al subgrupo con ID indicado."
+          }
+        },
+        {
+          "name": "Buscar intercambios de un alimento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/alimentos/1/intercambios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "alimentos", "1", "intercambios"]
+            },
+            "description": "Devuelve los alimentos que pueden reemplazar al alimento con el ID indicado (mismo subgrupo = equivalencia calórica)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Nutrientes",
+      "description": "Perfil nutricional detallado por alimento.",
+      "item": [
+        {
+          "name": "Obtener nutrientes de un alimento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/nutrientes/alimento/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "nutrientes", "alimento", "1"]
+            },
+            "description": "Devuelve el perfil nutricional del alimento con el ID indicado.\n- 200 OK si existe.\n- 404 Not Found si el alimento no tiene perfil nutricional cargado."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Requerimientos Energéticos",
+      "description": "Cálculo de TMB y GET mediante la fórmula de Harris-Benedict.",
+      "item": [
+        {
+          "name": "Calcular GET - Hombre",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"peso\": 80,\n  \"altura\": 180,\n  \"edad\": 35,\n  \"sexo\": \"MASCULINO\",\n  \"factorActividad\": 1.725\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/requerimientos/calcular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "requerimientos", "calcular"]
+            },
+            "description": "Calcula la Tasa Metabólica Basal (TMB) y el Gasto Energético Total (GET).\n\nFactores de actividad:\n- 1.2   → Sedentario\n- 1.375 → Ligeramente activo\n- 1.55  → Moderadamente activo\n- 1.725 → Muy activo\n- 1.9   → Extremadamente activo\n\nSexo aceptado: MASCULINO | FEMENINO"
+          }
+        },
+        {
+          "name": "Calcular GET - Mujer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"peso\": 60,\n  \"altura\": 162,\n  \"edad\": 28,\n  \"sexo\": \"FEMENINO\",\n  \"factorActividad\": 1.375\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/requerimientos/calcular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "requerimientos", "calcular"]
+            },
+            "description": "Ejemplo con paciente de sexo FEMENINO y actividad ligera."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Selecciones de Intercambio",
+      "description": "Registro del historial de intercambios seleccionados por el paciente.",
+      "item": [
+        {
+          "name": "Guardar selección (con paciente)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alimentoOrigenId\": 1,\n  \"alimentoReemplazoId\": 2,\n  \"pacienteId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/selecciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "selecciones"]
+            },
+            "description": "Registra la selección de un intercambio alimentario asociado a un paciente.\n\nValidaciones:\n- alimentoOrigenId y alimentoReemplazoId son obligatorios (@NotNull).\n- Ambos alimentos deben pertenecer al mismo subgrupo (mismo equivalente calórico).\n- pacienteId es opcional: omitirlo guarda la selección sin asociar paciente."
+          }
+        },
+        {
+          "name": "Guardar selección (anónima, sin paciente)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alimentoOrigenId\": 1,\n  \"alimentoReemplazoId\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/selecciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "selecciones"]
+            },
+            "description": "Selección sin paciente asociado. pacienteId puede omitirse."
+          }
+        },
+        {
+          "name": "Listar todas las selecciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/selecciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "selecciones"]
+            },
+            "description": "Devuelve el historial completo de selecciones de intercambio."
+          }
+        },
+        {
+          "name": "Listar selecciones por paciente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/selecciones/paciente/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "selecciones", "paciente", "1"]
+            },
+            "description": "Devuelve las selecciones del paciente con el ID indicado, ordenadas de más reciente a más antigua."
+          }
+        },
+        {
+          "name": "Eliminar selección",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/selecciones/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "selecciones", "1"]
+            },
+            "description": "Elimina la selección con el ID indicado.\n- 204 No Content si se eliminó correctamente."
+          }
+        },
+        {
+          "name": "ERROR - Body vacío (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/selecciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "selecciones"]
+            },
+            "description": "Ejemplo de error: body sin campos obligatorios. Respuesta esperada: 400 con mensajes @NotNull."
+          }
+        },
+        {
+          "name": "ERROR - Alimentos no intercambiables (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alimentoOrigenId\": 1,\n  \"alimentoReemplazoId\": 999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/selecciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "selecciones"]
+            },
+            "description": "Ejemplo de error: ID inexistente o alimentos de subgrupos distintos. Respuesta esperada: 400 con mensaje de negocio."
+          }
+        }
+      ]
+    }
+  ]
+}
